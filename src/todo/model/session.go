@@ -6,6 +6,7 @@ import (
 
 type Session struct {
 	ID        int
+	UUID      string
 	Email     string
 	UserID    int
 	CreatedAt time.Time
@@ -14,8 +15,8 @@ type Session struct {
 // CreateSession creates a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
 	//TODO: create class to pull SQL from files
-	statement := `insert into sessions (email, user_id, created_at) 
-    values ($1, $2, $3) returning id, email, user_id, created_at`
+	statement := `insert into sessions (uuid, email, user_id, created_at) 
+    values ($1, $2, $3, $4) returning id, uuid, email, user_id, created_at`
 
 	stmt, err := Database.Prepare(statement)
 	if err != nil {
@@ -24,26 +25,26 @@ func (user *User) CreateSession() (session Session, err error) {
 	defer stmt.Close()
 
 	// use QueryRow to return a row and scan the returned id into the Session struct
-	err = stmt.QueryRow(user.Email, user.ID, time.Now()).Scan(&session.ID, &session.Email, &session.UserID, &session.CreatedAt)
+	err = stmt.QueryRow(CreateUUID(), user.Email, user.ID, time.Now()).Scan(&session.ID, &session.UUID, &session.Email, &session.UserID, &session.CreatedAt)
 
 	return session, err
 }
 
 // Session get the session for an existing user
 func (user *User) Session() (session Session, err error) {
-	statement := `SELECT id, email, user_id, created_at FROM sessions WHERE user_id = $1`
+	statement := `SELECT id, uuid, email, user_id, created_at FROM sessions WHERE user_id = $1`
 
 	session = Session{}
-	err = Database.QueryRow(statement, user.ID).Scan(&session.ID, &session.Email, &session.UserID, &session.CreatedAt)
+	err = Database.QueryRow(statement, user.ID).Scan(&session.ID, &session.UUID, &session.Email, &session.UserID, &session.CreatedAt)
 
 	return session, err
 }
 
 // Check if session is valid in the database
 func (session *Session) Check() (valid bool, err error) {
-	statement := `SELECT id, email, user_id, created_at FROM sessions WHERE id = $1`
+	statement := `SELECT id, uuid, email, user_id, created_at FROM sessions WHERE uuid = $1`
 
-	err = Database.QueryRow(statement, session.ID).Scan(&session.ID, &session.Email, &session.UserID, &session.CreatedAt)
+	err = Database.QueryRow(statement, session.UUID).Scan(&session.ID, &session.UUID, &session.Email, &session.UserID, &session.CreatedAt)
 
 	if err != nil {
 		valid = false
@@ -57,29 +58,16 @@ func (session *Session) Check() (valid bool, err error) {
 	return valid, err
 }
 
-// Delete session from database
-func (session *Session) DeleteByID() (err error) {
-	statement := "delete from sessions where id = $1"
+// DeleteByUUID session from database
+func (session *Session) DeleteByUUID() (err error) {
+	statement := "delete from sessions where uuid = $1"
 	stmt, err := Database.Prepare(statement)
 	if err != nil {
 		return
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(session.ID)
-	return err
-}
-
-func (session *Session) DeleteByEmail() (err error) {
-	statement := "delete from sessions where email = $1"
-	stmt, err := Database.Prepare(statement)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(session.Email)
-
+	_, err = stmt.Exec(session.UUID)
 	return err
 }
 
