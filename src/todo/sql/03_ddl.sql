@@ -1,9 +1,16 @@
 -- Run against the todo database
-
 SET SESSION search_path = todo,public;
 
--- Table: todo.users
+DROP TABLE IF EXISTS todo.user_tasks;
+DROP TABLE IF EXISTS todo.task_tags;
+DROP TABLE IF EXISTS todo.tasks;
+DROP TABLE IF EXISTS todo.priorities;
+DROP TABLE IF EXISTS todo.status;
+DROP TABLE IF EXISTS todo.tags;
+DROP TABLE IF EXISTS todo.sessions;
 DROP TABLE IF EXISTS todo.users;
+
+-- Table: todo.users
 CREATE TABLE todo.users
 (
   id serial NOT NULL,
@@ -21,10 +28,10 @@ ALTER TABLE todo.users
   OWNER TO todo;
 
 -- Table: todo.sessions
-DROP TABLE IF EXISTS todo.sessions;
 CREATE TABLE todo.sessions
 (
   id serial NOT NULL,
+  uuid  character varying(64) not null unique,
   email character varying(255),
   user_id integer,
   created_at timestamp without time zone NOT NULL,
@@ -40,7 +47,6 @@ ALTER TABLE todo.sessions
   OWNER TO todo;
 
 -- Table: todo.priorities
-DROP TABLE IF EXISTS todo.priorities;
 CREATE TABLE todo.priorities
 (
   id serial NOT NULL,
@@ -54,7 +60,6 @@ ALTER TABLE todo.priorities
   OWNER TO todo;
 
 -- Table: todo.status
-DROP TABLE IF EXISTS todo.status;
 CREATE TABLE todo.status
 (
   id serial NOT NULL,
@@ -68,7 +73,6 @@ ALTER TABLE todo.status
   OWNER TO todo;
 
 -- Table: todo.tasks
-DROP TABLE IF EXISTS todo.tasks;
 CREATE TABLE todo.tasks
 (
   id serial NOT NULL,
@@ -93,7 +97,6 @@ ALTER TABLE todo.tasks
   OWNER TO todo;
 
 -- Table: todo.user_tasks
-DROP TABLE IF EXISTS todo.user_tasks;
 CREATE TABLE todo.user_tasks
 (
   id serial NOT NULL,
@@ -114,7 +117,6 @@ ALTER TABLE todo.user_tasks
   OWNER TO todo;
 
 -- Table: todo.tags
-DROP TABLE IF EXISTS todo.tags;
 CREATE TABLE todo.tags
 (
   id serial NOT NULL,
@@ -128,7 +130,6 @@ ALTER TABLE todo.tags
   OWNER TO todo;
 
 -- Table: todo.task_tags
-DROP TABLE IF EXISTS todo.task_tags;
 CREATE TABLE todo.task_tags
 (
   id serial NOT NULL,
