@@ -13,7 +13,8 @@ func Load() {
 
 // Index displays the Home page
 func index(rw http.ResponseWriter, req *http.Request) {
-	template := view.ParseTemplates("home")
+	views := []string{"home/home"}
+	template := view.ParseTemplates(views...)
 	if template == nil {
 		rw.Write([]byte("Template 'home.html' not found!"))
 	} else {
