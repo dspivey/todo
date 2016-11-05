@@ -1,28 +1,34 @@
 package log
 
 import (
-    "log"
-    "os"
+	"log"
+	"os"
 )
 
 var logger *log.Logger
 
 func init() {
-    file, err := os.OpenFile("checklist.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile("checklist.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalln("Failed to open log file", err)
 	}
-    logger = log.New(file, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
+	logger = log.New(file, "INFO ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 // for logging
-func Info(args ...interface{}) {
-	logger.SetPrefix("INFO ")
+func Danger(args ...interface{}) {
+	logger.SetPrefix("ERROR ")
 	logger.Println(args...)
 }
 
-func Danger(args ...interface{}) {
-	logger.SetPrefix("ERROR ")
+func Fatal(args ...interface{}) {
+	logger.SetPrefix("FATAL ")
+	logger.Println(args...)
+	log.Fatalln(args...)
+}
+
+func Info(args ...interface{}) {
+	logger.SetPrefix("INFO ")
 	logger.Println(args...)
 }
 
