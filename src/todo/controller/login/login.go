@@ -72,11 +72,11 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 		}
 		cookie := http.Cookie{
 			Name:     "_cookie",
-			Value:    session.Email,
+			Value:    session.UUID,
 			HttpOnly: true,
 		}
 		http.SetCookie(writer, &cookie)
-		http.Redirect(writer, request, "/", 302)
+		http.Redirect(writer, request, "/home", 302)
 	} else {
 		http.Redirect(writer, request, "/login", 302)
 	}
@@ -88,8 +88,8 @@ func logout(writer http.ResponseWriter, request *http.Request) {
 	cookie, err := request.Cookie("_cookie")
 	if err != http.ErrNoCookie {
 		log.Warning(err, "Failed to get cookie")
-		session := model.Session{Email: cookie.Value}
-		session.DeleteByEmail()
+		session := model.Session{UUID: cookie.Value}
+		session.DeleteByUUID()
 	}
 
 	http.Redirect(writer, request, "/", 302)
