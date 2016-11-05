@@ -16,7 +16,7 @@ func getViewsDir() (path string) {
 func ParseTemplates(templateNames ...string) (t *template.Template) {
 	var files []string
 
-	t = template.New("views")
+	t = template.New("view")
 	for _, file := range templateNames {
 		fn := filepath.Join(getViewsDir(), fmt.Sprintf("%s.html", file))
 		files = append(files, fn)
@@ -38,5 +38,5 @@ func RenderHTML(writer http.ResponseWriter, model interface{}, templateNames ...
 	}
 
 	templates := template.Must(template.ParseFiles(files...))
-	templates.ExecuteTemplate(writer, "views", model)
+	templates.ExecuteTemplate(writer, "view", model)
 }
