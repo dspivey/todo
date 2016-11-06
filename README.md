@@ -37,4 +37,11 @@ has on his or her plate at any time.
 
 + https://github.com/blue-jay/blueprint
 + https://github.com/josephspurrier/gowebapp
-    
+
+## Development TODO ##
+
++ Implement a generic approach for handling routes, so that we don't have to define each route.
+    + Use gorilla, regex, or URL pattern
++ Research template approaches and implement a standard approach for templating.
+    + e.g. Template Inheritance
++ Cleanup code organization and move packages/source around to cut down on the number of imports, etc.
