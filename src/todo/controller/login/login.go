@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"todo/log"
 	"todo/model"
@@ -20,13 +21,10 @@ func Load() {
 // GET /login
 // show the login page
 func login(rw http.ResponseWriter, req *http.Request) {
+	isAuthRedirect := req.URL.Query().Get("auth")
+	fmt.Println(isAuthRedirect)
 	views := []string{"shared/_login.layout", "login/login"}
-	template := view.ParseTemplates(views...)
-	if template == nil {
-		rw.Write([]byte("Template 'login.html' not found!"))
-	} else {
-		template.Execute(rw, nil)
-	}
+	view.RenderHTML(rw, isAuthRedirect, views...)
 }
 
 // GET /signup
@@ -78,7 +76,8 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 		http.SetCookie(writer, &cookie)
 		http.Redirect(writer, request, "/home", 302)
 	} else {
-		http.Redirect(writer, request, "/login", 302)
+		log.Info("Incorrect password entered for user: ", user.Email)
+		http.Redirect(writer, request, "/login?auth=true", 302)
 	}
 }
 

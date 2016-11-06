@@ -1,10 +1,11 @@
-{{define "title"}}Home{{end}}
-{{define "head"}}{{end}}
+{{ define "content" }}
 
-<div class="container">
-    <div class="page-header">
-        <h1>{{template "title" .}}</h1>
+<a href="/logout">Logout</a>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Hello, {{ .Name }}
     </div>
 </div>
 
-{{template "footer" .}}
+{{ end }}

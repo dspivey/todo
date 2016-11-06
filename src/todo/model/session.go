@@ -1,6 +1,8 @@
 package model
 
 import (
+	"errors"
+	"net/http"
 	"time"
 )
 
@@ -56,6 +58,19 @@ func (session *Session) Check() (valid bool, err error) {
 	}
 
 	return valid, err
+}
+
+// Checks if the user is logged in and has a session, if not err is not nil
+func IsAuthenticated(writer http.ResponseWriter, request *http.Request) (sess Session, err error) {
+	cookie, err := request.Cookie("_cookie")
+	if err == nil {
+		sess = Session{UUID: cookie.Value}
+		if ok, _ := sess.Check(); !ok {
+			err = errors.New("Invalid session.")
+		}
+	}
+
+	return sess, err
 }
 
 // DeleteByUUID session from database
