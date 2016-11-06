@@ -7,18 +7,22 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doozer Checklist</title>
+  <title>{{ template "title" . }}</title>
   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+  {{ block "styles" .}}
+  {{ end }}
 </head>
 
 <body>
-  <div class="container">
+  {{ template "nav" . }}
+  <div class="container-fluid">
     {{ template "content" . }}
   </div>
   <script src="/static/js/jquery-3.1.1.min.js"></script>
   <script src="/static/js/bootstrap.min.js"></script>
+  {{ block "scripts" . }}
+  {{ end }}
 </body>
-
 </html>
 
 {{ end }}

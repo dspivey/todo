@@ -25,7 +25,7 @@ func index(rw http.ResponseWriter, req *http.Request) {
 			log.Danger(err, "Cannot get user from session")
 		}
 
-		views := []string{"shared/_layout", "home/home"}
+		views := []string{"shared/_layout", "shared/_navigation", "home/home"}
 		view.RenderHTML(rw, user, views...)
 	}
 }
