@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -18,21 +19,30 @@ func init() {
 // for logging
 func Danger(args ...interface{}) {
 	logger.SetPrefix("ERROR ")
-	logger.Println(args...)
+	print(false, args...)
 }
 
 func Fatal(args ...interface{}) {
 	logger.SetPrefix("FATAL ")
-	logger.Println(args...)
-	log.Fatalln(args...)
+	print(true, args...)
 }
 
 func Info(args ...interface{}) {
 	logger.SetPrefix("INFO ")
-	logger.Println(args...)
+	print(false, args...)
 }
 
 func Warning(args ...interface{}) {
 	logger.SetPrefix("WARNING ")
-	logger.Println(args...)
+	print(false, args...)
+}
+
+func print(isFatal bool, args ...interface{}) {
+	fmt.Println(args...)
+
+	if isFatal == true {
+		logger.Fatalln(args...)
+	} else {
+		logger.Println(args...)
+	}
 }

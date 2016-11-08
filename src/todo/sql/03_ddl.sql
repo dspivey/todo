@@ -13,13 +13,14 @@ DROP TABLE IF EXISTS todo.users;
 -- Table: todo.users
 CREATE TABLE todo.users
 (
-  id serial NOT NULL,
+  user_id serial NOT NULL,
   name character varying(255),
   email character varying(255) NOT NULL,
   password character varying(255) NOT NULL,
   created_at timestamp without time zone NOT NULL,
-  CONSTRAINT users_pkey PRIMARY KEY (id),
-  CONSTRAINT users_email_key UNIQUE (email)
+  CONSTRAINT users_pkey PRIMARY KEY (user_id),
+  CONSTRAINT users_email_key UNIQUE (email),
+  CONSTRAINT users_name_key UNIQUE (name)
 )
 WITH (
   OIDS=FALSE
@@ -30,14 +31,14 @@ ALTER TABLE todo.users
 -- Table: todo.sessions
 CREATE TABLE todo.sessions
 (
-  id serial NOT NULL,
+  session_id serial NOT NULL,
   uuid  character varying(64) not null unique,
   email character varying(255),
   user_id integer,
   created_at timestamp without time zone NOT NULL,
-  CONSTRAINT sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT sessions_pkey PRIMARY KEY (session_id),
   CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id)
-      REFERENCES todo.users (id) MATCH SIMPLE
+      REFERENCES todo.users (user_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -49,9 +50,10 @@ ALTER TABLE todo.sessions
 -- Table: todo.priorities
 CREATE TABLE todo.priorities
 (
-  id serial NOT NULL,
+  priority_id serial NOT NULL,
   value character varying(255),
-  CONSTRAINT priorities_pkey PRIMARY KEY (id)
+  CONSTRAINT priorities_pkey PRIMARY KEY (priority_id),
+  CONSTRAINT priorities_priority_key UNIQUE (value)
 )
 WITH (
   OIDS=FALSE
@@ -62,9 +64,10 @@ ALTER TABLE todo.priorities
 -- Table: todo.status
 CREATE TABLE todo.status
 (
-  id serial NOT NULL,
+  status_id serial NOT NULL,
   value character varying(255),
-  CONSTRAINT status_pkey PRIMARY KEY (id)
+  CONSTRAINT status_pkey PRIMARY KEY (status_id),
+  CONSTRAINT status_status_key UNIQUE (value)
 )
 WITH (
   OIDS=FALSE
@@ -75,19 +78,19 @@ ALTER TABLE todo.status
 -- Table: todo.tasks
 CREATE TABLE todo.tasks
 (
-  id serial NOT NULL,
+  task_id serial NOT NULL,
   value character varying(255),
   priority_id integer,
   status_id integer,
   created_at timestamp without time zone NOT NULL,
   due_at timestamp without time zone,
   complete_at timestamp without time zone,
-  CONSTRAINT tasks_pkey PRIMARY KEY (id),
+  CONSTRAINT tasks_pkey PRIMARY KEY (task_id),
   CONSTRAINT tasks_priority_id_fkey FOREIGN KEY (priority_id)
-      REFERENCES todo.priorities (id) MATCH SIMPLE
+      REFERENCES todo.priorities (priority_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT tasks_status_id_fkey FOREIGN KEY (status_id)
-      REFERENCES todo.status (id) MATCH SIMPLE
+      REFERENCES todo.status (status_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -99,15 +102,15 @@ ALTER TABLE todo.tasks
 -- Table: todo.user_tasks
 CREATE TABLE todo.user_tasks
 (
-  id serial NOT NULL,
+  user_task_id serial NOT NULL,
   task_id integer,
   user_id integer,
-  CONSTRAINT user_tasks_pkey PRIMARY KEY (id),
+  CONSTRAINT user_tasks_pkey PRIMARY KEY (user_task_id),
   CONSTRAINT user_tasks_task_id_fkey FOREIGN KEY (task_id)
-      REFERENCES todo.tasks (id) MATCH SIMPLE
+      REFERENCES todo.tasks (task_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT user_tasks_user_id_fkey FOREIGN KEY (user_id)
-      REFERENCES todo.users (id) MATCH SIMPLE
+      REFERENCES todo.users (user_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
@@ -119,9 +122,10 @@ ALTER TABLE todo.user_tasks
 -- Table: todo.tags
 CREATE TABLE todo.tags
 (
-  id serial NOT NULL,
-  tag character varying(255),
-  CONSTRAINT tags_pkey PRIMARY KEY (id)
+  tag_id serial NOT NULL,
+  value character varying(255),
+  CONSTRAINT tags_pkey PRIMARY KEY (tag_id),
+  CONSTRAINT tags_tag UNIQUE (value)
 )
 WITH (
   OIDS=FALSE
@@ -132,16 +136,17 @@ ALTER TABLE todo.tags
 -- Table: todo.task_tags
 CREATE TABLE todo.task_tags
 (
-  id serial NOT NULL,
+  task_tag_id serial NOT NULL,
   task_id integer,
   tag_id integer,
-  CONSTRAINT task_tags_pkey PRIMARY KEY (id),
+  CONSTRAINT task_tags_pkey PRIMARY KEY (task_tag_id),
   CONSTRAINT task_tags_tag_id_fkey FOREIGN KEY (tag_id)
-      REFERENCES todo.tags (id) MATCH SIMPLE
+      REFERENCES todo.tags (tag_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT task_tags_task_id_fkey FOREIGN KEY (task_id)
-      REFERENCES todo.tasks (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      REFERENCES todo.tasks (task_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT task_tags_unique UNIQUE (task_id, tag_id)
 )
 WITH (
   OIDS=FALSE

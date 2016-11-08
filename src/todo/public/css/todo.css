@@ -1,0 +1,90 @@
+.task-panel {
+    width: 50%;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.75);
+}
+
+.task {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+
+.task-check {
+    padding: 5px;
+}
+
+.task-due {
+
+}
+
+.task-title {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    background: #404040;
+    color: #fff;
+    font-size: large;
+    font-weight: bold;
+}
+
+.task-value {
+    font-size: x-large;
+}
+
+.task-priority {
+    font-size: small;
+}
+
+.task-status {
+    font-size: small;
+}
+
+.task-add {
+    padding: 8px;
+}
+
+.task-button {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 5px;
+    color: #ccc;
+}
+
+.task-add-link {
+    font-size: larger;
+    color: #ccc;
+}
+
+.task-add-link-hover {
+    cursor: pointer;
+    color: #333;
+}
+
+.task-editor {
+    padding: 8px;
+}
+
+.task-new {
+    
+}
+
+.task-new .task-value {
+    width: 75%;
+    display: inline;
+    font-size: medium;
+    border-radius: 0;
+}
+
+.task-new .task-due {
+    width: 25%;
+    display: inline;
+    font-size: medium;
+    margin-left: -5px;
+    border-radius: 0;
+}
+
+.task-new .task-buttons {
+    padding: 5px 0;
+}

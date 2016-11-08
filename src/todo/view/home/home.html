@@ -1,10 +1,91 @@
-{{ define "title" }}Doozer Checklist{{end}}
+{{ define "title" }}{{.Title}}{{end}}
+{{ define "styles" }}
+<link href="/static/css/todo.css" rel="stylesheet">
+{{ end}}
 {{ define "content" }}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        Hello, {{ .Name }}
+<div class="task-panel">
+    <div class="task-title">Task {{ .User.Name }}</div>
+    {{ range $index, $element := .Tasks }}
+    <div class="task" data-id="{{ $element.TaskId }}">
+        <span class="task-check"><input type="checkbox" /></span>
+        <span class="task-value">{{ $element.Value }}</span>
+        <span class="task-due">{{ $element.DueAtDate }}</span>
+        <span class="task-priority">{{ $element.Priority | ToLower }}</span>,
+        <span class="task-status">{{ $element.Status | ToLower }}</span>
+    </div>
+    {{ end}}
+    <div class="task-add">
+        <span id="taskAdd" class="task-add-link">
+            <button class="task-button">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+            Add Task
+        </span>
+    </div>
+    <div class="task-editor hidden">
+        <div class="task-new">
+            <input type="text" id="taskValue" class="form-control task-value" placeholder="Add task..." />
+            <input type="datetime" id="taskDue" class="form-control task-due" />
+            <div class="task-buttons">
+                <button type="button" id="btnSaveTask" class="btn btn-primary">Add Task</button>
+                <button type="button" id="btnCancelTask" class="btn btn-default">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
 
+{{ end }}
+
+{{ define "scripts" }}
+    <script type="text/javascript">
+        var taskAdd = $("#taskAdd");
+        var taskAddDiv = $(".task-add");
+        var taskEditorDiv = $(".task-editor");
+        var taskPanel = $(".task-panel");
+
+        var btnSaveTask = $("#btnSaveTask");
+        var btnCancelTask = $("#btnCancelTask");
+        
+        taskAdd.hover(function(){
+            $(this).addClass("task-add-link-hover")
+                .find("button")
+                .addClass("task-add-link-hover");
+        }, function(){
+            $(this).removeClass("task-add-link-hover")
+                .find("button")
+                .removeClass("task-add-link-hover");
+        });    
+
+        taskAdd.click(function(){
+            taskAddDiv.addClass("hidden");
+            taskEditorDiv.removeClass("hidden");
+        });
+
+        btnSaveTask.click(function(){
+            var task = $("#taskValue");
+            var due = $("#taskDue");
+
+            $.ajax({
+                url: "/tasks/create",
+                method: "POST",
+                data: {
+                    task: task.val(),
+                    due: due.val()
+                },
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                }
+            });
+        });
+
+        btnCancelTask.click(function(){
+            taskEditorDiv.addClass("hidden");
+            taskAddDiv.removeClass("hidden");
+        });
+    </script>
 {{ end }}
