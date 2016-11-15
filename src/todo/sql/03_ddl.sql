@@ -1,7 +1,6 @@
 -- Run against the todo database
 SET SESSION search_path = todo,public;
 
-DROP TABLE IF EXISTS todo.user_tasks;
 DROP TABLE IF EXISTS todo.task_tags;
 DROP TABLE IF EXISTS todo.tasks;
 DROP TABLE IF EXISTS todo.priorities;
@@ -80,12 +79,16 @@ CREATE TABLE todo.tasks
 (
   task_id serial NOT NULL,
   value character varying(255),
+  user_id integer,
   priority_id integer,
   status_id integer,
   created_at timestamp without time zone NOT NULL,
   due_at timestamp without time zone,
   complete_at timestamp without time zone,
   CONSTRAINT tasks_pkey PRIMARY KEY (task_id),
+  CONSTRAINT tasks_user_id_fkey FOREIGN KEY (user_id)
+      REFERENCES todo.users (user_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT tasks_priority_id_fkey FOREIGN KEY (priority_id)
       REFERENCES todo.priorities (priority_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -97,26 +100,6 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE todo.tasks
-  OWNER TO todo;
-
--- Table: todo.user_tasks
-CREATE TABLE todo.user_tasks
-(
-  user_task_id serial NOT NULL,
-  task_id integer,
-  user_id integer,
-  CONSTRAINT user_tasks_pkey PRIMARY KEY (user_task_id),
-  CONSTRAINT user_tasks_task_id_fkey FOREIGN KEY (task_id)
-      REFERENCES todo.tasks (task_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT user_tasks_user_id_fkey FOREIGN KEY (user_id)
-      REFERENCES todo.users (user_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE todo.user_tasks
   OWNER TO todo;
 
 -- Table: todo.tags

@@ -1,6 +1,24 @@
 {{ define "title" }}{{.Title}}{{end}}
 {{ define "styles" }}
+<link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+<link href="/static/css/select2.min.css" rel="stylesheet">
+<link href="/static/css/select2-bootstrap.min.css" rel="stylesheet">
 <link href="/static/css/todo.css" rel="stylesheet">
+<style type="text/css">
+
+    .select2-container--bootstrap .select2-selection {
+        border-radius: 0;
+    }
+
+    .select2-container--bootstrap {
+        display: inline-block;
+    }
+
+    .select2-container {
+        margin: 0 -5px 0 0;
+    }
+
+</style>
 {{ end}}
 {{ define "content" }}
 
@@ -11,8 +29,8 @@
         <span class="task-check"><input type="checkbox" /></span>
         <span class="task-value">{{ $element.Value }}</span>
         <span class="task-due">{{ $element.DueAtDate }}</span>
-        <span class="task-priority">{{ $element.Priority | ToLower }}</span>,
-        <span class="task-status">{{ $element.Status | ToLower }}</span>
+        <span class="task-priority">{{ $element.Priority.Value | ToLower }}</span>,
+        <span class="task-status">{{ $element.Status.Value | ToLower }}</span>
     </div>
     {{ end}}
     <div class="task-add">
@@ -25,8 +43,22 @@
     </div>
     <div class="task-editor hidden">
         <div class="task-new">
-            <input type="text" id="taskValue" class="form-control task-value" placeholder="Add task..." />
-            <input type="datetime" id="taskDue" class="form-control task-due" />
+            <div class="form-group">
+                <input type="text" id="taskValue" class="form-control task-value" placeholder="Add task..." />
+                <input type="text" id="taskDue" class="form-control task-due" value="{{ FormatDate Now "01/02/2006" }}" />
+            </div>
+            <div class="form-group">
+                <select id="taskTag" class="form-control task-tag" multiple="multiple" style="width: 50%">
+                    {{ range $index, $element := .Tags }}
+                        <option value="{{ $element.TagId }}">{{ $element.Value }}</option>
+                    {{ end }}
+                </select>
+                <select id="taskPriority" class="form-control task-priority" style="width: 50%">
+                    {{ range $index, $element := .Priorities }}
+                        <option value="{{ $element.PriorityId }}">{{ $element.Value }}</option>
+                    {{ end }}
+                </select>
+            </div>
             <div class="task-buttons">
                 <button type="button" id="btnSaveTask" class="btn btn-primary">Add Task</button>
                 <button type="button" id="btnCancelTask" class="btn btn-default">Cancel</button>
@@ -38,6 +70,8 @@
 {{ end }}
 
 {{ define "scripts" }}
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+    <script src="/static/js/select2.full.min.js"></script>
     <script type="text/javascript">
         var taskAdd = $("#taskAdd");
         var taskAddDiv = $(".task-add");
@@ -55,27 +89,53 @@
             $(this).removeClass("task-add-link-hover")
                 .find("button")
                 .removeClass("task-add-link-hover");
-        });    
+        });
 
         taskAdd.click(function(){
             taskAddDiv.addClass("hidden");
             taskEditorDiv.removeClass("hidden");
         });
 
+        $("#taskTag").select2({
+            placeholder: "Add tags...",
+            allowClear: true,
+            tags: true,
+            theme: "bootstrap"
+        });
+
+        $("#taskPriority").select2({
+            placeholder: "Select a priority...",
+            theme: "bootstrap"
+        });
+
+        $('#taskDue').datepicker({
+            todayBtn: true,
+            autoclose: true,
+            todayHighlight: true
+        });
+
         btnSaveTask.click(function(){
             var task = $("#taskValue");
             var due = $("#taskDue");
+            var tags = $("#taskTag");
+            var priority = $("#taskPriority");
+
+            var data = {
+                task: task.val(),
+                due: due.val(),
+                tags: tags.val(),
+                priority: priority.val()
+            };
+            console.log(data);
 
             $.ajax({
                 url: "/tasks/create",
                 method: "POST",
-                data: {
-                    task: task.val(),
-                    due: due.val()
-                },
+                data: data,
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
+                    //window.location.reload();
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.log(xhr);
@@ -84,6 +144,16 @@
         });
 
         btnCancelTask.click(function(){
+            var task = $("#taskValue");
+            var due = $("#taskDue");
+            var tags = $("#taskTag");
+            var priority = $("#taskPriority");
+
+            task.val("");
+            due.val("{{ FormatDate Now "01/02/2006" }}");
+            tags.val("").trigger("change");
+            priority.val("").trigger("change");
+
             taskEditorDiv.addClass("hidden");
             taskAddDiv.removeClass("hidden");
         });

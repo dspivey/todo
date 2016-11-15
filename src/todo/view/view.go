@@ -7,12 +7,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 	"todo/log"
 )
 
 var funcMap map[string]interface{} = template.FuncMap{
-	"ToUpper": strings.ToUpper,
-	"ToLower": strings.ToLower,
+	"ToUpper":    strings.ToUpper,
+	"ToLower":    strings.ToLower,
+	"Now":        time.Now,
+	"FormatDate": formatDate,
+}
+
+func formatDate(t time.Time, layout string) string {
+	return t.Format(layout)
 }
 
 func getViewsDir() (path string) {

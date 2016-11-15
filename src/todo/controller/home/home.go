@@ -3,6 +3,7 @@ package home
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 	"todo/log"
 	"todo/model"
@@ -34,10 +35,22 @@ func index(rw http.ResponseWriter, req *http.Request) {
 			log.Danger(err, "Cannot get tasks for user")
 		}
 
+		priorities, err := model.Priorities()
+		if err != nil {
+			log.Danger(err, "Cannot get priorities")
+		}
+
+		tags, err := model.Tags()
+		if err != nil {
+			log.Danger(err, "Cannot get priorities")
+		}
+
 		vm := viewmodel.HomeViewModel{
-			Title: "Doozer Checklist",
-			User:  user,
-			Tasks: tasks,
+			Title:      "Doozer Checklist",
+			User:       user,
+			Tasks:      tasks,
+			Priorities: priorities,
+			Tags:       tags,
 		}
 
 		views := []string{"shared/_layout", "shared/_navigation", "home/home"}
@@ -61,21 +74,30 @@ func createTask(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		user, err := s.User()
-		task := model.Task{
-			Value:      req.PostFormValue("task"),
-			User:       &user,
-			StatusId:   4,
-			PriorityId: 5,
+		if err != nil {
+			log.Danger(err, "Cannot get user from session")
 		}
 
-		task, err = user.CreateTask(task.Value, task.PriorityId, task.StatusId, time.Now())
+		taskValue := req.PostFormValue("task")
+
+		priorityId, err := strconv.ParseInt(req.PostFormValue("priority"), 10, 64)
+		if err != nil {
+			log.Danger(err, "Could not parse Priority Id from form request")
+		}
+
+		dueAt, err := time.Parse("01/02/2006", req.PostFormValue("due"))
+		if err != nil {
+			log.Danger(err, "Could not parse Due Date from form request")
+		}
+
+		task, err := user.CreateTask(taskValue, int(priorityId), 0, dueAt)
 		if err != nil {
 			log.Danger(err, "Cannot create task.")
 			jsonOutput, _ := json.Marshal(err)
 			rw.Write(jsonOutput)
 		}
 
-		log.Info(task.Value)
+		log.Info(task)
 
 		jsonOutput, err := json.Marshal(&task)
 		if err != nil {
