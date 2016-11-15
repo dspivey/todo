@@ -24,14 +24,14 @@ func login(rw http.ResponseWriter, req *http.Request) {
 	isAuthRedirect := req.URL.Query().Get("auth")
 	fmt.Println(isAuthRedirect)
 	views := []string{"shared/_login.layout", "login/login"}
-	view.RenderHTML(rw, isAuthRedirect, views...)
+	view.RenderHTML(rw, isAuthRedirect, "view", views...)
 }
 
 // GET /signup
 // Show the signup page
 func signup(rw http.ResponseWriter, req *http.Request) {
 	views := []string{"shared/_login.layout", "signup/signup"}
-	view.RenderHTML(rw, nil, views...)
+	view.RenderHTML(rw, nil, "view", views...)
 }
 
 // POST /signup

@@ -27,12 +27,12 @@ func getViewsDir() (path string) {
 	return filepath.Join(cwd, "src", "todo", "view")
 }
 
-func ParseTemplates(templateNames ...string) (t *template.Template) {
+func ParseTemplates(templateName string, templateFiles ...string) (t *template.Template) {
 	var files []string
 
-	t = template.New("view").Funcs(funcMap)
+	t = template.New(templateName).Funcs(funcMap)
 
-	for _, file := range templateNames {
+	for _, file := range templateFiles {
 		fn := filepath.Join(getViewsDir(), fmt.Sprintf("%s.html", file))
 		files = append(files, fn)
 		log.Info(fn)
@@ -43,19 +43,19 @@ func ParseTemplates(templateNames ...string) (t *template.Template) {
 	return t
 }
 
-func RenderHTML(writer http.ResponseWriter, model interface{}, templateNames ...string) {
+func RenderHTML(writer http.ResponseWriter, model interface{}, templateName string, templateFiles ...string) {
 	var files []string
 
-	for _, file := range templateNames {
+	for _, file := range templateFiles {
 		fn := filepath.Join(getViewsDir(), fmt.Sprintf("%s.html", file))
 		files = append(files, fn)
 		log.Info(fn)
 	}
 
-	templates := template.New("view").Funcs(funcMap)
+	templates := template.New(templateName).Funcs(funcMap)
 	templates = template.Must(templates.ParseFiles(files...))
 
-	err := templates.ExecuteTemplate(writer, "view", model)
+	err := templates.ExecuteTemplate(writer, templateName, model)
 	if err != nil {
 		log.Danger("Error processing template: ", err)
 	}

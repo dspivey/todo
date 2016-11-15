@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	"strconv"
 )
 
 type Task struct {
@@ -131,6 +132,48 @@ func (user *User) Tasks() (tasks []Task, err error) {
 	rows.Close()
 
 	return tasks, err
+}
+
+func (task *Task) AddTag(tagId int) (tag Tag, err error) {
+	tag = Tag{}
+	err = Database.QueryRow(
+		"insert into task_tags (task_id, tag_id) values ($1, $2) returning tag_id", task.TaskId, tag.TagId,
+	).Scan(
+		&tag.TagId,
+	)
+
+	// get the tag value by id
+	tag, err = TagById(tag.TagId)
+
+	return tag, err
+}
+
+func (task *Task) AddTags(t []string) (tags []Tag, err error) {
+	for _, tagValue := range t {
+		tagId, err := strconv.ParseInt(tagValue, 10, 64)
+		
+		// if we have an error that means we probably have a new tag to insert
+		if err != nil {
+			tag, err := CreateTag(tagValue)
+			if err != nil {
+				return tags, err
+			}
+
+			tag, err = task.AddTag(tag.TagId)
+			if err != nil {
+				return tags, err
+			}
+		}
+
+		tag, err := task.AddTag(int(tagId))
+		if err != nil {
+			return tags, err
+		}
+		
+		tags = append(tags, tag)
+	}
+
+	return tags, err
 }
 
 // Tags returns all tags attached to the task

@@ -1,0 +1,12 @@
+{{ define "tasks" }}
+<div class="task-title">Task {{ .User.Name }}</div>
+{{ range $index, $element := .Tasks }}
+<div class="task" data-id="{{ $element.TaskId }}">
+    <span class="task-check"><input type="checkbox" /></span>
+    <span class="task-value">{{ $element.Value }}</span>
+    <span class="task-due">{{ $element.DueAtDate }}</span>
+    <span class="task-priority">{{ $element.Priority.Value | ToLower }}</span>,
+    <span class="task-status">{{ $element.Status.Value | ToLower }}</span>
+</div>
+{{ end}}
+{{ end }}

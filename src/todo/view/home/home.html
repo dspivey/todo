@@ -1,78 +1,96 @@
-{{ define "title" }}{{.Title}}{{end}}
-{{ define "styles" }}
-<link href="/static/css/bootstrap-datepicker.min.css" rel="stylesheet">
+{{ define "title" }}{{.Title}}{{end}} {{ define "styles" }}
+<link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 <link href="/static/css/select2.min.css" rel="stylesheet">
 <link href="/static/css/select2-bootstrap.min.css" rel="stylesheet">
-<link href="/static/css/todo.css" rel="stylesheet">
-<style type="text/css">
+<link href="/static/css/todo.css" rel="stylesheet"> {{ end}} {{ define "content" }}
 
-    .select2-container--bootstrap .select2-selection {
-        border-radius: 0;
-    }
-
-    .select2-container--bootstrap {
-        display: inline-block;
-    }
-
-    .select2-container {
-        margin: 0 -5px 0 0;
-    }
-
-</style>
-{{ end}}
-{{ define "content" }}
-
-<div class="task-panel">
-    <div class="task-title">Task {{ .User.Name }}</div>
-    {{ range $index, $element := .Tasks }}
-    <div class="task" data-id="{{ $element.TaskId }}">
-        <span class="task-check"><input type="checkbox" /></span>
-        <span class="task-value">{{ $element.Value }}</span>
-        <span class="task-due">{{ $element.DueAtDate }}</span>
-        <span class="task-priority">{{ $element.Priority.Value | ToLower }}</span>,
-        <span class="task-status">{{ $element.Status.Value | ToLower }}</span>
-    </div>
-    {{ end}}
-    <div class="task-add">
-        <span id="taskAdd" class="task-add-link">
-            <button class="task-button">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-            Add Task
-        </span>
-    </div>
-    <div class="task-editor hidden">
-        <div class="task-new">
-            <div class="form-group">
-                <input type="text" id="taskValue" class="form-control task-value" placeholder="Add task..." />
-                <input type="text" id="taskDue" class="form-control task-due" value="{{ FormatDate Now "01/02/2006" }}" />
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">New Task</h3>
             </div>
-            <div class="form-group">
-                <select id="taskTag" class="form-control task-tag" multiple="multiple" style="width: 50%">
-                    {{ range $index, $element := .Tags }}
-                        <option value="{{ $element.TagId }}">{{ $element.Value }}</option>
-                    {{ end }}
-                </select>
-                <select id="taskPriority" class="form-control task-priority" style="width: 50%">
-                    {{ range $index, $element := .Priorities }}
-                        <option value="{{ $element.PriorityId }}">{{ $element.Value }}</option>
-                    {{ end }}
-                </select>
-            </div>
-            <div class="task-buttons">
-                <button type="button" id="btnSaveTask" class="btn btn-primary">Add Task</button>
-                <button type="button" id="btnCancelTask" class="btn btn-default">Cancel</button>
+            <div class="panel-body">
+                <div class="task-editor">
+                    <div class="task-new">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="taskValue" class="form-control task-value" placeholder="What do you need to do..." />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="taskDue" class="form-control task-due" placeholder="Select a due date..." />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select id="taskPriority" class="form-control task-priority" style="width: 100%">
+                                    {{ range $index, $element := .Priorities }}
+                                        {{ if eq $element.Value "Low" }}
+                                        <option value="{{ $element.PriorityId }}" selected="selected">{{ $element.Value }}</option>
+                                        {{ else }}
+                                        <option value="{{ $element.PriorityId }}">{{ $element.Value }}</option>
+                                        {{ end}}
+                                    {{ end }}
+                                </select>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-flag"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select id="taskTag" class="form-control task-tag" multiple="multiple" style="width: 100%">
+                                    {{ range $index, $element := .Tags }}
+                                        <option value="{{ $element.TagId }}">{{ $element.Value }}</option>
+                                    {{ end }}
+                                </select>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-tags"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" id="btnSaveTask" class="btn btn-primary">Add Task</button>
+                            <button type="button" id="btnCancelTask" class="btn btn-default">Clear</button>
+                            <button type="button" id="btnRefresh" class="btn btn-primary pull-right">Refresh Tasks</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{ end }}
+<div class="row">
+    <div class="col-md-12">
+        <div class="task-panel">
+            <div class="task-title">Task {{ .User.Name }}</div>
+            {{ range $index, $element := .Tasks }}
+            <div class="task" data-id="{{ $element.TaskId }}">
+                <span class="task-check"><input type="checkbox" /></span>
+                <span class="task-value">{{ $element.Value }}</span>
+                <span class="task-due">{{ $element.DueAtDate }}</span>
+                <span class="task-priority">{{ $element.Priority.Value | ToLower }}</span>,
+                <span class="task-status">{{ $element.Status.Value | ToLower }}</span>
+            </div>
+            {{ end}}
+        </div>
+    </div>
+</div>
 
-{{ define "scripts" }}
-    <script src="/static/js/bootstrap-datepicker.min.js"></script>
-    <script src="/static/js/select2.full.min.js"></script>
-    <script type="text/javascript">
+{{ end }} {{ define "scripts" }}
+<script src="/static/js/moment.min.js"></script>
+<script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/js/select2.full.min.js"></script>
+<script type="text/javascript">
         var taskAdd = $("#taskAdd");
         var taskAddDiv = $(".task-add");
         var taskEditorDiv = $(".task-editor");
@@ -108,13 +126,28 @@
             theme: "bootstrap"
         });
 
-        $('#taskDue').datepicker({
-            todayBtn: true,
-            autoclose: true,
-            todayHighlight: true
+        $('#taskDue').datetimepicker({
+            showTodayButton: true,
+            showClear: true,
+            keepOpen: false
         });
 
-        btnSaveTask.click(function(){
+        function refreshTasks(){
+            $.ajax({
+                url: "/tasks",
+                method: "GET",
+                dataType: "html",
+                success: function(data) {
+                    console.log(data);
+                    taskPanel.html(data);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                }
+            });
+        }
+
+        function saveTask(){
             var task = $("#taskValue");
             var due = $("#taskDue");
             var tags = $("#taskTag");
@@ -123,7 +156,7 @@
             var data = {
                 task: task.val(),
                 due: due.val(),
-                tags: tags.val(),
+                tags: JSON.stringify(tags.val()),
                 priority: priority.val()
             };
             console.log(data);
@@ -135,12 +168,32 @@
                 dataType: "json",
                 success: function(data) {
                     console.log(data);
-                    //window.location.reload();
+                    refreshTasks();
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.log(xhr);
                 }
             });
+            /*$.ajax({
+                url: "/tasks/test/tags",
+                method: "POST",
+                data: data,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr);
+                }
+            });*/
+        }
+
+        $("#btnRefresh").click(function(){
+            refreshTasks();
+        });
+
+        btnSaveTask.click(function(){
+            saveTask();
         });
 
         btnCancelTask.click(function(){
@@ -150,12 +203,9 @@
             var priority = $("#taskPriority");
 
             task.val("");
-            due.val("{{ FormatDate Now "01/02/2006" }}");
+            due.val("");
             tags.val("").trigger("change");
-            priority.val("").trigger("change");
-
-            taskEditorDiv.addClass("hidden");
-            taskAddDiv.removeClass("hidden");
+            var lowValue = priority.find("option").filter(function(){ return this.text == "Low";}).val();
+            priority.val(lowValue).trigger("change");
         });
-    </script>
-{{ end }}
+    </script> {{ end }}

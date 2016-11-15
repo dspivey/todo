@@ -41,3 +41,16 @@ func TagById(id int) (tag Tag, err error) {
 
 	return tag, err
 }
+
+// CreateTag inset a new tag into the database
+func CreateTag(value string)(tag Tag, err error){
+	tag = Tag{}
+	err = Database.QueryRow(
+		"insert into tags(value) values ($1) returning tag_id, value", value,
+	).Scan(
+		&tag.TagId,
+		&tag.Value,
+	)
+
+	return tag, err
+}
