@@ -8,6 +8,9 @@ import (
 	"os"
 	"todo/log"
 
+	"bytes"
+	"os/exec"
+
 	_ "github.com/lib/pq"
 )
 
@@ -24,14 +27,55 @@ func init() {
 
 // CheckDatabase will verify that the database exists and the application can connect to it
 func CheckDatabase() (err error) {
+	log.Info("Testing database connection...")
 	statement := "select * from users"
 	stmt, err := Database.Prepare(statement)
 	if err != nil {
-		return
+		return err
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec()
+
+	return err
+}
+
+func RunScript(dbname string, user string, script string) (err error) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	args := []string{
+		"-d",
+		dbname,
+		"-U",
+		user,
+		"-h",
+		"localhost",
+		"-p",
+		"5432",
+		"-x",
+		"-W",
+		"-a",
+		"--single-transaction",
+		"-v",
+		"ON_ERROR_STOP=1",
+		"--pset",
+		"pager=off",
+		"-L log.txt",
+		"-f",
+		script,
+	}
+
+	cmd := exec.Command("psql", args...)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+	if err != nil {
+		log.Danger("Error running PSQL command: ", stderr.String())
+	}
+
+	log.Info(stdout.String())
 
 	return err
 }

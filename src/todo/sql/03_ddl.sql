@@ -34,7 +34,7 @@ CREATE TABLE todo.sessions
   uuid  character varying(64) not null unique,
   email character varying(255),
   user_id integer,
-  created_at timestamp without time zone NOT NULL,
+  created_at timestamp with time zone NOT NULL,
   CONSTRAINT sessions_pkey PRIMARY KEY (session_id),
   CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id)
       REFERENCES todo.users (user_id) MATCH SIMPLE
