@@ -12,11 +12,11 @@ import (
 	"todo/router"
 )
 
-var dbCheck = flag.Bool("db_check", false, "Specify whether the application should check if it can connect to the database on startup.")
 var action = flag.String("a", "", "Specify a utility action to execute, such as executing a SQL script, rather than running the main application.")
 var dbName = flag.String("d", "todo", "Specify the database name to use for an action.")
 var userName = flag.String("U", "todo", "Specify the user name to use for an action.")
 var file = flag.String("f", "", "Specify a file path to use for an action.")
+var dbCheck = flag.Bool("c", true, "Specify whether the application should check if it can connect to the database on startup.")
 
 func handleFlags() {
 	flag.Parse()
